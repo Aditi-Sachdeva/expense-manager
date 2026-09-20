@@ -1,9 +1,9 @@
 # OS files
 .DS_Store
 Thumbs.db
- 
+
 # Editor settings
 .vscode/
- 
-# Dependencies (if you add npm later)
-node_modules/
+
+# Logs
+*.log
