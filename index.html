@@ -4,25 +4,123 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
+  <title>Dashboard — Expense Manager</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
-  <!-- Sidebar -->
+
   <div id="sidebar-container"></div>
 
-  <!-- Menu button for mobile -->
   <button id="menuBtn" style="background:none; border:none; font-size:24px; cursor:pointer;">
     <svg width="22" height="22" viewBox="0 0 24 24">
       <path d="M3 6h18M3 12h18M3 18h18" stroke="#6a0dad" stroke-width="2" stroke-linecap="round" />
     </svg>
   </button>
 
-  <!-- Main content -->
-  <main style="margin-left:240px; padding:20px;">
-    <h1>Dashboard</h1>
-    <p>Welcome to your Expense Manager!</p>
+  <main class="main-content">
+
+    <div class="page-header">
+      <h1>Dashboard</h1>
+      <p>Here's an overview of your finances.</p>
+    </div>
+
+    <div class="page-content">
+
+      <section class="stats">
+        <div class="stat-box">
+          <h3>Total Balance</h3>
+          <p class="amount" id="totalBalance">₹0.00</p>
+          <small>Across all accounts</small>
+        </div>
+
+        <div class="stat-box">
+          <h3>Income</h3>
+          <p class="amount green" id="monthIncome">₹0.00</p>
+          <small>This month</small>
+        </div>
+
+        <div class="stat-box">
+          <h3>Expenses</h3>
+          <p class="amount red" id="monthExpenses">₹0.00</p>
+          <small>This month</small>
+        </div>
+
+        <div class="stat-box">
+          <h3>Net Savings</h3>
+          <p class="amount purple" id="netSavings">₹0.00</p>
+          <small>Income minus expenses</small>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <h2>Smart Alerts</h2>
+          <a href="alerts.html">View All Alerts</a>
+        </div>
+        <div class="card-body" id="alertsList">
+          <p class="empty">No active alerts. Your spending and financial goals are in good standing.</p>
+        </div>
+      </section>
+
+      <div class="row row-wide">
+        <section class="card">
+          <div class="card-header">
+            <h2>Recent Transactions</h2>
+            <a href="transactions.html">View All</a>
+          </div>
+          <div class="card-body" id="recentTransactions">
+            <div class="empty">
+              <h4>No transactions recorded yet</h4>
+              <p>Record your first income or expense to see activity here.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">
+            <h2>Accounts</h2>
+            <a href="accounts.html">Manage</a>
+          </div>
+          <div class="card-body" id="accountsList">
+            <div class="empty">
+              <h4>No accounts added yet</h4>
+              <p>Add bank accounts or cash wallets to track balances.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="row">
+        <section class="card">
+          <div class="card-header">
+            <h2>Current Month Budgets</h2>
+            <a href="budgets.html">Manage</a>
+          </div>
+          <div class="card-body" id="budgetsList">
+            <div class="empty">
+              <h4>No budgets set for this month</h4>
+              <p>Set spending limits for categories to monitor expenses.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">
+            <h2>Financial Goals</h2>
+            <a href="goals.html">Manage</a>
+          </div>
+          <div class="card-body" id="goalsList">
+            <div class="empty">
+              <h4>No financial goals yet</h4>
+              <p>Track your progress toward savings targets.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+    </div>
+
   </main>
 
   <script src="js/sidebar.js"></script>
