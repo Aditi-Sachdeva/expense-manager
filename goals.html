@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Financial Goals — Expense Manager</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <div id="sidebar-container"></div>
+
+  <button id="menuBtn" style="background:none; border:none; font-size:24px; cursor:pointer;">
+    <svg width="22" height="22" viewBox="0 0 24 24">
+      <path d="M3 6h18M3 12h18M3 18h18" stroke="#6a0dad" stroke-width="2" stroke-linecap="round" />
+    </svg>
+  </button>
+
+  <main class="main-content">
+
+    <div class="page-header">
+      <h1>Financial Goals</h1>
+      <p>Track your savings targets and milestone progress.</p>
+    </div>
+
+    <div class="page-content">
+
+      <section class="stats">
+        <div class="stat-box">
+          <h3>Total Target</h3>
+          <p class="amount" id="totalTarget">₹0.00</p>
+          <small>Total savings goal</small>
+        </div>
+
+        <div class="stat-box">
+          <h3>Total Saved</h3>
+          <p class="amount green" id="totalSaved">₹0.00</p>
+          <small>Current accumulated amount</small>
+        </div>
+
+        <div class="stat-box">
+          <h3>Total Remaining</h3>
+          <p class="amount" id="totalRemaining">₹0.00</p>
+          <small>Remaining to achieve goals</small>
+        </div>
+
+        <div class="stat-box">
+          <h3>Overall Progress</h3>
+          <p class="amount purple" id="overallProgress">0.0%</p>
+          <small>Total saved / total target</small>
+        </div>
+      </section>
+
+      <div class="page-top">
+        <div>
+          <h2>Savings Goals</h2>
+          <p>Define clear financial targets with due dates and tracked progress</p>
+        </div>
+
+        <div>
+          <button class="btn btn-primary" id="addGoalBtn">+ Add Goal</button>
+        </div>
+      </div>
+
+      <section class="card filters filters-equal">
+        <select id="statusFilter">
+          <option value="all">All Statuses</option>
+          <option value="in-progress">In Progress</option>
+          <option value="completed">Completed</option>
+          <option value="overdue">Overdue</option>
+        </select>
+
+        <select id="sortFilter">
+          <option value="date-earliest">Target Date (Earliest First)</option>
+          <option value="date-latest">Target Date (Latest First)</option>
+          <option value="progress-highest">Progress (Highest First)</option>
+          <option value="progress-lowest">Progress (Lowest First)</option>
+        </select>
+      </section>
+
+      <section class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Goal Name</th>
+                <th>Target (₹)</th>
+                <th>Saved (₹)</th>
+                <th>Remaining (₹)</th>
+                <th>Target Date</th>
+                <th>Progress</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="goalsTableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="empty" id="emptyMessage">
+          <h4>No financial goals yet</h4>
+          <p>Create your first savings target to track your progress towards financial milestones.</p>
+          <button class="btn btn-primary" id="addFirstGoalBtn">+ Add First Goal</button>
+        </div>
+
+        <div class="table-footer">
+          Showing <span id="goalCount">0</span> goals
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <script src="js/sidebar.js"></script>
+</body>
+
+</html>
