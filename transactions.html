@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transactions — Expense Manager</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <div id="sidebar-container"></div>
+
+  <!-- Menu button for mobile -->
+  <button id="menuBtn" style="background:none; border:none; font-size:24px; cursor:pointer;">
+    <svg width="22" height="22" viewBox="0 0 24 24">
+      <path d="M3 6h18M3 12h18M3 18h18" stroke="#6a0dad" stroke-width="2" stroke-linecap="round" />
+    </svg>
+  </button>
+
+  <!-- Main content -->
+  <main class="main-content">
+
+    <!-- Page title -->
+    <div class="page-header">
+      <h1>Transactions</h1>
+      <p>Record and manage your income and expenses.</p>
+    </div>
+
+    <!-- Everything below the header -->
+    <div class="page-content">
+
+      <!-- Heading on the left, two buttons on the right -->
+      <div class="page-top">
+        <div>
+          <h2>All Transactions</h2>
+          <p>View, search, and filter your financial history</p>
+        </div>
+
+        <div>
+          <button class="btn" id="recordIncomeBtn">Record Income</button>
+          <button class="btn btn-primary" id="recordExpenseBtn">Record Expense</button>
+        </div>
+      </div>
+
+      <!-- Search + filters -->
+      <section class="card filters">
+        <input type="text" id="searchInput" placeholder="Search description, payment method...">
+
+        <select id="typeFilter">
+          <option value="all">All Types</option>
+          <option value="income">Income</option>
+          <option value="expense">Expense</option>
+        </select>
+
+        <select id="categoryFilter">
+          <option value="all">All Categories</option>
+        </select>
+
+        <select id="accountFilter">
+          <option value="all">All Accounts</option>
+        </select>
+
+        <select id="sortFilter">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="highest">Highest Amount</option>
+          <option value="lowest">Lowest Amount</option>
+        </select>
+
+        <label for="fromDate">From:</label>
+        <input type="date" id="fromDate">
+
+        <div id="dateContainer">
+        <label for="toDate">To:</label>
+        <input type="date" id="toDate">
+        </div>
+
+      </section>
+
+      <!-- Transactions table -->
+      <section class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Account</th>
+                <th>Description</th>
+                <th>Method</th>
+                <th>Amount (₹)</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <!-- JS will add one row here for every transaction -->
+            <tbody id="transactionsTableBody"></tbody>
+          </table>
+        </div>
+
+        <!-- Shown when there are no transactions -->
+        <div class="empty" id="emptyMessage">
+          <h4>No transactions recorded yet</h4>
+          <p>Record your first income or expense to start tracking your finances.</p>
+        </div>
+
+        <div class="table-footer">
+          Showing <span id="transactionCount">0</span> transactions
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <script src="js/sidebar.js"></script>
+</body>
+
+</html>
