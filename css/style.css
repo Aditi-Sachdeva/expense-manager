@@ -194,15 +194,23 @@ body {
 
 .empty {
   text-align: center;
-  padding: 30px;
+  padding: 40px;
   color: #666;
 }
 
 .empty h4 {
   color: #000;
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: 8px;
-  font-size: 16px;
+  font-size: 15px;
+}
+
+.empty p{
+  font-size: 14px;
+}
+
+#alertsList p{
+  font-size: 14px;
 }
 
 .row {
@@ -252,7 +260,7 @@ body {
 }
 
 .btn {
-  padding: 10px 16px;
+  padding: 10px 14px;
   border: 1px solid #ddd;
   border-radius: 6px;
   background: #fff;
@@ -347,4 +355,20 @@ td {
   .filters select {
     width: 100%;                
   }
+}
+
+.empty .btn {
+  margin-top: 10px;
+}
+
+
+.filters-equal select {
+  flex: 1;             
+  min-width: 150px;     
+}
+
+#addFirstBudgetBtn, #addFirstGoalBtn {
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 600;               
 }
