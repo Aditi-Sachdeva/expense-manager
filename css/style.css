@@ -28,7 +28,7 @@ body {
 }
 
 .brand {
-  font-weight: bolder;
+  font-weight: 700;
   font-size: 18px;
   color: #6a0dad;
   text-decoration: none;
@@ -47,7 +47,7 @@ body {
   padding: 14px 30px;
   color: #333;
   text-decoration: none;
-  font-weight: bold;
+  font-weight: 600;
   font-size: 14px;
 }
 
@@ -117,7 +117,7 @@ body {
 }
 
 .page-content {
-  padding: 5px 40px 20px 40px;     
+  padding: 5px 60px 20px 40px;     
 }
 
 .stats {
@@ -194,13 +194,15 @@ body {
 
 .empty {
   text-align: center;
-  padding: 20px;
+  padding: 30px;
   color: #666;
 }
 
 .empty h4 {
   color: #000;
+  font-weight: 600;
   margin-bottom: 8px;
+  font-size: 16px;
 }
 
 .row {
@@ -226,5 +228,123 @@ body {
 
   .page-content {
     padding: 0 20px 20px 20px;
+  }
+}
+
+.page-top {
+  display: flex;
+  justify-content: space-between;  
+  align-items: center;            
+  flex-wrap: wrap;                 
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.page-top h2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.page-top p {
+  font-size: 13px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.btn {
+  padding: 10px 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  color: #333;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;                 
+}
+
+.btn:hover {
+  background: #f3e9ff;
+}
+
+.btn-primary {
+  background: #6a0dad;
+  border-color: #6a0dad;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: #560a8c;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;                
+  align-items: center;
+  gap: 18px;
+  padding: 20px;
+}
+
+.filters input,
+.filters select{
+  padding: 8px 10px;
+  border: 1.5px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 14px;
+}
+
+.filters input[type="text"] {
+  flex: 1;                         
+  min-width: 220px;
+}
+
+.filters label {
+  font-size: 13px;
+  color: #666;
+}
+
+#dateContainer{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.table-wrap {
+  overflow-x: auto;               
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;      
+  min-width: 800px;
+}
+
+th {
+  text-align: left;
+  padding: 14px 20px;
+  font-size: 12px;
+  color: #666;
+  text-transform: uppercase;      
+  background: #fafafa;
+  border-bottom: 1px solid #ddd;
+}
+
+td {
+  padding: 14px 20px;
+  font-size: 13px;
+  border-bottom: 1px solid #eee;
+}
+
+.table-footer {
+  padding: 15px 20px;
+  font-size: 13px;
+  color: #666;
+  border-top: 1px solid #ddd;
+}
+
+@media (max-width: 768px) {
+  .filters input,
+  .filters select {
+    width: 100%;                
   }
 }
