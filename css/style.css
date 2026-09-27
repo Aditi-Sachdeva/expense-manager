@@ -220,7 +220,7 @@ body {
 }
 
 .row-wide {
-  grid-template-columns: 2fr 1fr;  
+  grid-template-columns: 1.9fr 1.1fr;  
 }
 
 @media (max-width: 768px) {
@@ -433,11 +433,11 @@ td {
   background: #fef2f2;
 }
 
-.small-table {
+.categories-table {
   min-width: 0;
 }
 
-.small-table td:last-child {
+.categories-table td:last-child {
   white-space: nowrap;
 }
 
@@ -530,9 +530,54 @@ td {
 }
 
 
-table {
+.accounts-table {
   table-layout: fixed;  
 }
-th, td {
+.accounts-table th, .accounts-table td {
   width: 20%;          
+}
+
+.account-name {
+  font-weight: 600;
+
+}
+
+.badge-neutral {
+  background: #f3f4f6; 
+  color: #333;
+  font-weight: 600;     
+  font-size: 12px;
+}
+
+.balance {
+  font-weight: 500;
+}
+
+.category-name {
+  font-weight: 600;
+}
+
+.badge {
+  font-weight: 500;
+}
+
+.accounts-table td {
+  font-size: 14px;
+}
+
+.accounts-table th {
+  font-size: 12px;
+}
+
+.categories-table th {
+  font-size: 12px;
+}
+
+.categories-table td{
+  font-size: 14px;
+}
+
+#emptyMessage,
+#noMatchMessage {
+  display: none;  
 }

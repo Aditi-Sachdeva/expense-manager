@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Categories — Expense Manager</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div id="sidebar-container"></div>
+
+  <button id="menuBtn" style="background:none; border:none; font-size:24px; cursor:pointer;">
+    <svg width="22" height="22" viewBox="0 0 24 24">
+      <path d="M3 6h18M3 12h18M3 18h18" stroke="#6a0dad" stroke-width="2" stroke-linecap="round" />
+    </svg>
+  </button>
+
+  <main class="main-content">
+
+    <div class="page-header">
+      <h1>Categories</h1>
+      <p>Manage classifications for income and expenses.</p>
+    </div>
+
+    <div class="page-content">
+
+      <div class="page-top">
+        <div>
+          <h2>Categories</h2>
+          <p>Organize your transactions into clear classifications</p>
+        </div>
+
+        <div>
+          <button class="btn btn-primary" id="addCategoryBtn">+ Add Category</button>
+        </div>
+      </div>
+
+      <div class="row row-wide">
+
+        <section class="card">
+          <div class="card-header">
+            <h2>Expense Categories</h2>
+            <span class="badge badge-expense">Outflow</span>
+          </div>
+          <div class="table-wrap">
+            <table class="categories-table">
+              <thead>
+                <tr>
+                  <th>Category Name</th>
+                  <th>Type</th>
+                  <th class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="expenseCategoriesBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">
+            <h2>Income Categories</h2>
+            <span class="badge badge-income">Inflow</span>
+          </div>
+          <div class="table-wrap">
+            <table class="categories-table">
+              <thead>
+                <tr>
+                  <th>Category Name</th>
+                  <th>Type</th>
+                  <th class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="incomeCategoriesBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <div class="modal-overlay hidden" id="categoryModal">
+    <div class="modal">
+
+      <div class="modal-header">
+        <h2 id="modalTitle">Add New Category</h2>
+        <button type="button" class="modal-close" id="closeModalBtn">&times;</button>
+      </div>
+
+      <form id="categoryForm">
+
+        <div class="form-group">
+          <label for="categoryName">Category Name *</label>
+          <input type="text" id="categoryName" placeholder="e.g. Groceries, Freelance" required>
+        </div>
+
+        <div class="form-group">
+          <label for="categoryType">Category Type *</label>
+          <select id="categoryType" required>
+            <option value="expense">Expense</option>
+            <option value="income">Income</option>
+          </select>
+          <small class="field-hint">Determines where this category can be selected in transactions.</small>
+        </div>
+
+        <div class="modal-buttons">
+          <button type="button" class="btn" id="cancelBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Category</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <script src="js/sidebar.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/categories.js"></script>
+</body>
+
+</html>
