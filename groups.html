@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Group Expenses — Expense Manager</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <div id="sidebar-container"></div>
+
+  <button id="menuBtn" style="background:none; border:none; font-size:24px; cursor:pointer;">
+    <svg width="22" height="22" viewBox="0 0 24 24">
+      <path d="M3 6h18M3 12h18M3 18h18" stroke="#6a0dad" stroke-width="2" stroke-linecap="round" />
+    </svg>
+  </button>
+
+  <main class="main-content">
+
+    <div class="page-header">
+      <h1>Group Expenses</h1>
+      <p>Split shared bills, track who paid, and calculate member balances.</p>
+    </div>
+
+    <div class="page-content">
+
+      <div class="groups-layout">
+
+        <section class="card groups-panel">
+          <div class="card-header">
+            <h2>Groups</h2>
+            <button class="btn btn-primary btn-small" id="newGroupBtn">+ New Group</button>
+          </div>
+          <div class="card-body" id="groupsList">
+            <div class="empty empty-big">
+              <h4>No groups yet</h4>
+              <p>Create your first group to start splitting expenses.</p>
+              <button class="btn btn-primary btn-small" id="createGroupBtn">+ Create Group</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card groups-details">
+          <div class="card-body" id="groupDetails">
+            <div class="empty empty-big">
+              <h4>No group selected</h4>
+              <p>Select a group from the left panel or create a new one to manage members, expenses, and settlements.</p>
+              <button class="btn btn-primary btn-small" id="createFirstGroupBtn">+ Create Group</button>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <div class="modal-overlay hidden" id="groupModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="groupModalTitle">New Group</h2>
+        <button type="button" class="modal-close" id="closeGroupModalBtn">&times;</button>
+      </div>
+      <form id="groupForm">
+        <div class="form-group">
+          <label for="groupName">Group Name *</label>
+          <input type="text" id="groupName" placeholder="e.g. Goa Trip, Flatmates" required>
+        </div>
+        <div class="modal-buttons">
+          <button type="button" class="btn" id="cancelGroupBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Group</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay hidden" id="memberModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Add Member</h2>
+        <button type="button" class="modal-close" id="closeMemberModalBtn">&times;</button>
+      </div>
+      <form id="memberForm">
+        <div class="form-group">
+          <label for="memberName">Member Name *</label>
+          <input type="text" id="memberName" placeholder="e.g. Riya, Karan" required>
+          <small class="field-hint">Just a name — members are not user accounts, only labels used for splitting.</small>
+        </div>
+        <div class="modal-buttons">
+          <button type="button" class="btn" id="cancelMemberBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Member</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay hidden" id="expenseModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="expenseModalTitle">Add Group Expense</h2>
+        <button type="button" class="modal-close" id="closeExpenseModalBtn">&times;</button>
+      </div>
+      <form id="expenseForm">
+
+        <div class="form-group">
+          <label for="expenseDescription">Description *</label>
+          <input type="text" id="expenseDescription" placeholder="e.g. Dinner, Cab fare" required>
+        </div>
+
+        <div class="form-group">
+          <label for="expenseAmount">Total Amount (₹) *</label>
+          <input type="number" id="expenseAmount" placeholder="e.g. 1200.00" min="0.01" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+          <label for="expensePaidBy">Paid By *</label>
+          <select id="expensePaidBy" required>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="expenseDate">Date *</label>
+          <input type="date" id="expenseDate" required>
+        </div>
+
+        <div class="form-group">
+          <label for="splitType">Split Type *</label>
+          <select id="splitType" required>
+            <option value="equal">Split Equally</option>
+            <option value="exact">Exact Amounts</option>
+            <option value="percentage">Percentage</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="splitDetails"></div>
+
+        <div class="modal-buttons">
+          <button type="button" class="btn" id="cancelExpenseBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Expense</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay hidden" id="settleModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Settle Up</h2>
+        <button type="button" class="modal-close" id="closeSettleModalBtn">&times;</button>
+      </div>
+      <form id="settleForm">
+
+        <div class="form-group">
+          <label for="settleFrom">From (who is paying) *</label>
+          <select id="settleFrom" required></select>
+        </div>
+
+        <div class="form-group">
+          <label for="settleTo">To (who is receiving) *</label>
+          <select id="settleTo" required></select>
+        </div>
+
+        <div class="form-group">
+          <label for="settleAmount">Amount (₹) *</label>
+          <input type="number" id="settleAmount" placeholder="e.g. 500.00" min="0.01" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+          <label for="settleDate">Date *</label>
+          <input type="date" id="settleDate" required>
+        </div>
+
+        <div class="modal-buttons">
+          <button type="button" class="btn" id="cancelSettleBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Record Settlement</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <script src="js/sidebar.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/groups.js"></script>
+</body>
+
+</html>
