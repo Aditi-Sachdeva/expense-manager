@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alerts — Expense Manager</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+
+<body>
+
+  <div id="sidebar-container"></div>
+
+  <button id="menuBtn" style="background:none; border:none; font-size:24px; cursor:pointer;">
+    <svg width="22" height="22" viewBox="0 0 24 24">
+      <path d="M3 6h18M3 12h18M3 18h18" stroke="#6a0dad" stroke-width="2" stroke-linecap="round" />
+    </svg>
+  </button>
+
+  <main class="main-content">
+
+    <div class="page-header">
+      <h1>Alerts</h1>
+      <p>Spending warnings for your budgets, and email notification settings.</p>
+    </div>
+
+    <div class="page-content">
+
+      <section class="stats">
+        <div class="stat-box">
+          <h3>Halfway Used</h3>
+          <p class="amount purple" id="halfwayCount">0</p>
+          <small>Between 50% and 84%</small>
+        </div>
+
+        <div class="stat-box">
+          <h3>Near Limit</h3>
+          <p class="amount" id="nearLimitCount">0</p>
+          <small>Between 85% and 99%</small>
+        </div>
+
+        <div class="stat-box">
+          <h3>Exceeded</h3>
+          <p class="amount red" id="exceededCount">0</p>
+          <small>100% or over budget</small>
+        </div>
+
+        <div class="stat-box">
+          <h3>Emails Sent</h3>
+          <p class="amount green" id="emailsSentCount">0</p>
+          <small>Total alert emails sent</small>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <h2>Email Notification Settings</h2>
+        </div>
+        <div class="card-body">
+          <form id="settingsForm">
+
+            <div class="toggle-row">
+              <input type="checkbox" id="emailEnabled">
+              <label for="emailEnabled">Send me an email when a budget crosses 50%, 85%, or 100%</label>
+            </div>
+
+            <div class="form-group">
+              <label for="recipientEmail">Email Address</label>
+              <input type="email" id="recipientEmail" placeholder="you@example.com">
+              <small class="field-hint">Alerts will be sent to this address. Each budget only emails you once per level per month.</small>
+            </div>
+
+            <div class="modal-buttons">
+              <button type="submit" class="btn btn-primary">Save Settings</button>
+            </div>
+
+          </form>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <h2>Active Alerts</h2>
+        </div>
+        <div class="card-body" id="activeAlertsList">
+          <p class="empty-inline">No active alerts. Your spending is within budget.</p>
+        </div>
+      </section>
+      
+      <section class="card">
+        <div class="card-header">
+          <h2>Alert History</h2>
+          <button class="btn btn-small btn-danger" id="clearLogBtn">Clear History</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Category</th>
+                <th>Month</th>
+                <th>Level</th>
+                <th>Email</th>
+              </tr>
+            </thead>
+            <tbody id="alertLogTableBody"></tbody>
+          </table>
+        </div>
+        <div class="empty" id="emptyLogMessage">
+          <h4>No alerts sent yet</h4>
+          <p>Once a budget crosses 50%, 85%, or 100%, it will appear here.</p>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <script src="js/sidebar.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/alerts.js"></script>
+</body>
+
+</html>
