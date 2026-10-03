@@ -21,10 +21,10 @@ function renderAccounts() {
     accounts.forEach((acc, index) => {
       const row = document.createElement("tr");
       row.innerHTML = `
-        <td>${acc.name}</td>
-        <td>${acc.type}</td>
-        <td>${acc.initialBalance}</td>
-        <td>${acc.currentBalance}</td>
+        <td class="account-name">${acc.name}</td>
+        <td><span class="badge badge-neutral">${acc.type}</span></td>
+        <td class="balance">${formatMoney(acc.initialBalance)}</td>
+        <td class="balance ${acc.currentBalance < 0 ? "red" : "green"}">${formatMoney(acc.currentBalance)}</td>
         <td class="text-right">
           <button class="btn btn-small" onclick="editAccount(${index})">Edit</button>
           <button class="btn btn-small btn-danger" onclick="deleteAccount(${index})">Delete</button>
@@ -38,19 +38,52 @@ function renderAccounts() {
 
 accountForm.addEventListener("submit", function (e) {
   e.preventDefault();
-  const updatedAccount = {
-    name: document.getElementById("accountName").value,
-    type: document.getElementById("accountType").value,
-    initialBalance: document.getElementById("initialBalance").value,
-    currentBalance: document.getElementById("initialBalance").value
+
+  const name = document.getElementById("accountName").value.trim();
+  const type = document.getElementById("accountType").value;
+  const initial = parseFloat(document.getElementById("initialBalance").value);
+
+  if (!name || isNaN(initial) || initial < 0) {
+    alert("Please enter a valid name and balance.");
+    return;
+  }
+
+  const duplicate = accounts.some((a, i) =>
+    a.name.toLowerCase() === name.toLowerCase() && i !== editIndex
+  );
+  if (duplicate) {
+    alert("An account with this name already exists.");
+    return;
+  }
+
+  let currentBalance = initial;
+
+  if (editIndex !== null) {
+    const old = accounts[editIndex];
+    currentBalance = Number(old.currentBalance) - Number(old.initialBalance) + initial;
+
+    if (old.name !== name) {
+      const transactions = loadData("transactions");
+      transactions.forEach(t => {
+        if (t.account === old.name) t.account = name;
+      });
+      saveData("transactions", transactions);
+    }
+  }
+
+  const newAccount = {
+    name,
+    type,
+    initialBalance: initial,
+    currentBalance: Math.round(currentBalance * 100) / 100 
   };
 
   if (editIndex !== null) {
-    accounts[editIndex] = updatedAccount;
+    accounts[editIndex] = newAccount;
     editIndex = null;
     modalTitle.textContent = "Add New Account";
   } else {
-    accounts.push(updatedAccount);
+    accounts.push(newAccount);
   }
 
   saveData("accounts", accounts);
@@ -70,8 +103,13 @@ function editAccount(index) {
 }
 
 function deleteAccount(index) {
-  const confirmDelete = confirm("Do you really want to delete this account?");
-  if (confirmDelete) {
+  const transactions = loadData("transactions");
+  if (transactions.some(t => t.account === accounts[index].name)) {
+    alert("This account has transactions. Delete those transactions first.");
+    return;
+  }
+
+  if (confirm("Do you really want to delete this account?")) {
     accounts.splice(index, 1);
     saveData("accounts", accounts);
     renderAccounts();
@@ -79,7 +117,8 @@ function deleteAccount(index) {
 }
 
 addAccountBtn.addEventListener("click", () => {
-  editIndex = null; 
+  editIndex = null;
+  accountForm.reset();
   modalTitle.textContent = "Add New Account";
   accountModal.classList.remove("hidden");
 });
