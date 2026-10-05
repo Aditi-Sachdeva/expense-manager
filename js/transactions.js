@@ -24,23 +24,33 @@ const transactionType = document.getElementById("transactionType");
 const transactionCategory = document.getElementById("transactionCategory");
 const transactionAccount = document.getElementById("transactionAccount");
 
-let transactions = loadData("transactions") || [];
-let accounts = loadData("accounts") || [];
-let categories = loadData("categories") || [];
+let transactions = loadData("transactions");
+let accounts = loadData("accounts");
+let categories = loadData("categories");
 let editIndex = null;
-
-function formatMoney(amount) {
-    return "₹" + amount.toFixed(2);
-}
 
 function saveAll() {
     saveData("transactions", transactions);
     saveData("accounts", accounts);
 }
 
+function updateAccountBalance(t, undo) {
+
+    const acc = accounts.find(a => a.name === t.account);
+    if (!acc) return;
+
+    let change = t.type === "income" ? t.amount : -t.amount;
+    if (undo) change = -change;
+
+    acc.currentBalance = Math.round((Number(acc.currentBalance) + change) * 100) / 100;
+}
+
 function populateFilters() {
+
     categoryFilter.innerHTML = `<option value="all">All Categories</option>`;
+
     const uniqueNames = [...new Set(categories.map(cat => cat.name))];
+
     uniqueNames.forEach(name => {
         const opt = document.createElement("option");
         opt.value = name;
@@ -49,6 +59,7 @@ function populateFilters() {
     });
 
     accountFilter.innerHTML = `<option value="all">All Accounts</option>`;
+
     accounts.forEach(acc => {
         const opt = document.createElement("option");
         opt.value = acc.name;
@@ -58,6 +69,7 @@ function populateFilters() {
 }
 
 function populateModalDropdowns() {
+
     const type = transactionType.value;
 
     transactionCategory.innerHTML = "";
@@ -79,29 +91,44 @@ function populateModalDropdowns() {
     });
 }
 
-recordIncomeBtn.addEventListener("click", () => {
-    editIndex = null;
-    modalTitle.textContent = "Record Income";
-    transactionForm.reset();
-    transactionType.value = "income";
-    populateModalDropdowns();
-    transactionModal.classList.remove("hidden");
-});
+function openModal(type) {
 
-recordExpenseBtn.addEventListener("click", () => {
     editIndex = null;
-    modalTitle.textContent = "Record Expense";
     transactionForm.reset();
-    transactionType.value = "expense";
+    transactionType.value = type;
     populateModalDropdowns();
-    transactionModal.classList.remove("hidden");
-});
 
-closeModalBtn.addEventListener("click", () => transactionModal.classList.add("hidden"));
-cancelBtn.addEventListener("click", () => transactionModal.classList.add("hidden"));
+    if (accounts.length === 0) {
+        alert("Add an account first (Accounts page).");
+        return;
+    }
+    if (transactionCategory.options.length === 0) {
+        alert("Add an " + type + " category first (Categories page).");
+        return;
+    }
+
+    modalTitle.textContent = type === "income" ? "Record Income" : "Record Expense";
+
+    const now = new Date();
+    document.getElementById("transactionDate").value = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") 
+    + "-" + String(now.getDate()).padStart(2, "0");
+
+    transactionModal.classList.remove("hidden");
+}
+
+function closeModal() {
+    transactionModal.classList.add("hidden");
+    editIndex = null;
+}
+
+recordIncomeBtn.addEventListener("click", () => openModal("income"));
+recordExpenseBtn.addEventListener("click", () => openModal("expense"));
+closeModalBtn.addEventListener("click", closeModal);
+cancelBtn.addEventListener("click", closeModal);
 transactionType.addEventListener("change", populateModalDropdowns);
 
 transactionForm.addEventListener("submit", (e) => {
+
     e.preventDefault();
 
     const newTransaction = {
@@ -110,36 +137,38 @@ transactionForm.addEventListener("submit", (e) => {
         category: transactionCategory.value,
         account: transactionAccount.value,
         date: document.getElementById("transactionDate").value,
-        description: document.getElementById("transactionDescription").value,
-        method: document.getElementById("transactionMethod").value,
+        description: document.getElementById("transactionDescription").value.trim(),
+        method: document.getElementById("transactionMethod").value.trim(),
     };
 
+    if (!(newTransaction.amount > 0)) {
+        alert("Amount must be greater than 0.");
+        return;
+    }
+    if (!newTransaction.category || !newTransaction.account) {
+        alert("Please choose a category and an account.");
+        return;
+    }
+
     if (editIndex !== null) {
-        const old = transactions[editIndex];
-        const oldAcc = accounts.find(a => a.name === old.account);
-        if (oldAcc) {
-            if (old.type === "income") oldAcc.currentBalance -= old.amount;
-            else oldAcc.currentBalance += old.amount;
-        }
+        updateAccountBalance(transactions[editIndex], true);
         transactions[editIndex] = newTransaction;
-    } else {
+    } 
+    else {
         transactions.push(newTransaction);
     }
 
-    const acc = accounts.find(a => a.name === newTransaction.account);
-    if (acc) {
-        if (newTransaction.type === "income") acc.currentBalance += newTransaction.amount;
-        else acc.currentBalance -= newTransaction.amount;
-    }
+    updateAccountBalance(newTransaction, false);
 
     saveAll();
-    transactionModal.classList.add("hidden");
+    closeModal();
     transactionForm.reset();
-    editIndex = null;
     renderTransactions();
+
 });
 
 function editTransaction(index) {
+
     const t = transactions[index];
     editIndex = index;
 
@@ -155,16 +184,12 @@ function editTransaction(index) {
     document.getElementById("transactionMethod").value = t.method;
 
     transactionModal.classList.remove("hidden");
+
 }
 
 function deleteTransaction(index) {
     if (confirm("Delete this transaction?")) {
-        const t = transactions[index];
-        const acc = accounts.find(a => a.name === t.account);
-        if (acc) {
-            if (t.type === "income") acc.currentBalance -= t.amount;
-            else acc.currentBalance += t.amount;
-        }
+        updateAccountBalance(transactions[index], true);
         transactions.splice(index, 1);
         saveAll();
         renderTransactions();
@@ -172,6 +197,7 @@ function deleteTransaction(index) {
 }
 
 function renderTransactions() {
+
     transactionsTableBody.innerHTML = "";
 
     if (transactions.length === 0) {
@@ -183,7 +209,7 @@ function renderTransactions() {
 
     let filtered = [...transactions];
 
-    const search = searchInput.value.toLowerCase();
+    const search = searchInput.value.trim().toLowerCase();
     if (search) {
         filtered = filtered.filter(t =>
             (t.description && t.description.toLowerCase().includes(search)) ||
@@ -212,11 +238,14 @@ function renderTransactions() {
 
     if (sortFilter.value === "newest") {
         filtered.sort((a, b) => b.date.localeCompare(a.date));
-    } else if (sortFilter.value === "oldest") {
+    } 
+    else if (sortFilter.value === "oldest") {
         filtered.sort((a, b) => a.date.localeCompare(b.date));
-    } else if (sortFilter.value === "highest") {
+    } 
+    else if (sortFilter.value === "highest") {
         filtered.sort((a, b) => b.amount - a.amount);
-    } else if (sortFilter.value === "lowest") {
+    } 
+    else if (sortFilter.value === "lowest") {
         filtered.sort((a, b) => a.amount - b.amount);
     }
 
