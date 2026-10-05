@@ -24,30 +24,31 @@ const goalTarget = document.getElementById("goalTarget");
 const goalSaved = document.getElementById("goalSaved");
 const goalDate = document.getElementById("goalDate");
 
-let goals = loadData("goals") || [];
+let goals = loadData("goals");
 let editIndex = null;
-
-function formatMoney(amount) {
-  return "₹" + amount.toFixed(2);
-}
 
 function saveAll() {
   saveData("goals", goals);
 }
 
 function getStatus(goal) {
-  const today = new Date();
-  const targetDate = new Date(goal.date);
+
+  const now = new Date();
+  const today = now.getFullYear() + "-" +
+    String(now.getMonth() + 1).padStart(2, "0") + "-" +
+    String(now.getDate()).padStart(2, "0");
+
   if (goal.saved >= goal.target) return "completed";
-  if (today > targetDate && goal.saved < goal.target) return "overdue";
+
+  if (goal.date < today) return "overdue";
+
   return "in-progress";
 }
 
-function openModal(isEdit = false) {
-  if (!isEdit) {
-    modalTitle.textContent = "Add Financial Goal";
-    goalForm.reset();
-  }
+function openModal() {
+  editIndex = null;
+  modalTitle.textContent = "Add Financial Goal";
+  goalForm.reset();
   goalModal.classList.remove("hidden");
 }
 
@@ -65,6 +66,11 @@ goalForm.addEventListener("submit", e => {
     date: goalDate.value
   };
 
+  if (!newGoal.name || !(newGoal.target > 0)) {
+    alert("Please enter a goal name and a target greater than 0.");
+    return;
+  }
+
   if (newGoal.saved > newGoal.target) {
     alert("Saved amount cannot exceed target amount.");
     return;
@@ -72,7 +78,8 @@ goalForm.addEventListener("submit", e => {
 
   if (editIndex !== null) {
     goals[editIndex] = newGoal;
-  } else {
+  } 
+  else {
     goals.push(newGoal);
   }
 
@@ -119,23 +126,44 @@ function renderGoals() {
   }
 
   if (sortFilter.value === "date-earliest") {
-    filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
-  } else if (sortFilter.value === "date-latest") {
-    filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-  } else if (sortFilter.value === "progress-highest") {
+    filtered.sort((a, b) => a.date.localeCompare(b.date));
+  } 
+  else if (sortFilter.value === "date-latest") {
+    filtered.sort((a, b) => b.date.localeCompare(a.date));
+  } 
+  else if (sortFilter.value === "progress-highest") {
     filtered.sort((a, b) => (b.saved / b.target) - (a.saved / a.target));
-  } else if (sortFilter.value === "progress-lowest") {
+  } 
+  else if (sortFilter.value === "progress-lowest") {
     filtered.sort((a, b) => (a.saved / a.target) - (b.saved / b.target));
   }
 
+  if (filtered.length === 0) {
+    goalsTableBody.innerHTML = `<tr><td colspan="8" class="empty">No goals match this filter.</td></tr>`;
+    goalCount.textContent = 0;
+    updateStats([]);
+    return;
+  }
+
   filtered.forEach(g => {
+    
     const remaining = g.target - g.saved;
     const progress = g.target ? (g.saved / g.target * 100) : 0;
     const status = getStatus(g);
     let badgeClass, progressClass;
-    if (status === "completed") { badgeClass = "badge-income"; progressClass = ""; }
-    else if (status === "overdue") { badgeClass = "badge-expense"; progressClass = "danger"; }
-    else { badgeClass = "badge-warning"; progressClass = "warning"; }
+
+    if (status === "completed") { 
+      badgeClass = "badge-income"; 
+      progressClass = ""; 
+    }
+    else if (status === "overdue") { 
+      badgeClass = "badge-expense"; 
+      progressClass = "danger"; 
+    }
+    else { 
+      badgeClass = "badge-warning"; 
+      progressClass = "warning"; 
+    }
 
     const realIndex = goals.indexOf(g);
     const row = document.createElement("tr");
@@ -163,10 +191,10 @@ function renderGoals() {
 }
 
 function updateStats(list) {
-  const totalTarget = list.reduce((s,g)=>s+g.target,0);
-  const totalSaved = list.reduce((s,g)=>s+g.saved,0);
+  const totalTarget = list.reduce((s, g) => s + g.target, 0);
+  const totalSaved = list.reduce((s, g) => s + g.saved, 0);
   const totalRemaining = totalTarget - totalSaved;
-  const progress = totalTarget ? (totalSaved/totalTarget*100).toFixed(1) : 0;
+  const progress = totalTarget ? (totalSaved / totalTarget * 100).toFixed(1) : 0;
 
   totalTargetEl.textContent = formatMoney(totalTarget);
   totalSavedEl.textContent = formatMoney(totalSaved);
@@ -174,8 +202,8 @@ function updateStats(list) {
   overallProgressEl.textContent = progress + "%";
 }
 
-addGoalBtn.addEventListener("click", ()=>openModal());
-addFirstGoalBtn.addEventListener("click", ()=>openModal());
+addGoalBtn.addEventListener("click", openModal);
+addFirstGoalBtn.addEventListener("click", openModal);
 closeModalBtn.addEventListener("click", closeModal);
 cancelBtn.addEventListener("click", closeModal);
 statusFilter.addEventListener("change", renderGoals);

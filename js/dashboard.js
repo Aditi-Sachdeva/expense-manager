@@ -1,3 +1,4 @@
+
 const totalBalanceEl = document.getElementById("totalBalance");
 const monthIncomeEl = document.getElementById("monthIncome");
 const monthExpensesEl = document.getElementById("monthExpenses");
@@ -16,6 +17,8 @@ const goals = loadData("goals");
 
 const today = new Date();
 const currentMonth = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0");
+
+const todayText = currentMonth + "-" + String(today.getDate()).padStart(2, "0");
 
 function calcSpent(budget) {
   return transactions
@@ -45,17 +48,29 @@ function renderStats() {
 }
 
 function renderAlerts() {
-  const monthBudgets = budgets.filter(b => b.month === currentMonth);
   const alerts = [];
 
-  monthBudgets.forEach(b => {
+  budgets.filter(b => b.month === currentMonth).forEach(b => {
     const spent = calcSpent(b);
     const percent = spent / b.amount * 100;
+    const text = `${formatMoney(spent)} of ${formatMoney(b.amount)} (${percent.toFixed(1)}%)`;
 
     if (percent >= 100) {
-      alerts.push({ b, spent, percent, name: "Exceeded", color: "#dc2626" });
-    } else if (percent >= 80) {
-      alerts.push({ b, spent, percent, name: "Near Limit", color: "#d97706" });
+      alerts.push({ title: b.category, text, name: "Exceeded", color: "#dc2626" });
+    } 
+    else if (percent >= 80) {
+      alerts.push({ title: b.category, text, name: "Near Limit", color: "#d97706" });
+    }
+  });
+
+  goals.forEach(g => {
+    if (g.saved < g.target && g.date < todayText) {
+      alerts.push({
+        title: g.name,
+        text: `${formatMoney(g.saved)} of ${formatMoney(g.target)} saved, due ${g.date}`,
+        name: "Overdue Goal",
+        color: "#dc2626"
+      });
     }
   });
 
@@ -66,8 +81,8 @@ function renderAlerts() {
     alertsList.innerHTML += `
       <div class="alert-row">
         <div class="alert-info">
-          <strong>${a.b.category}</strong>
-          <p>${formatMoney(a.spent)} of ${formatMoney(a.b.amount)} (${a.percent.toFixed(1)}%)</p>
+          <strong>${a.title}</strong>
+          <p>${a.text}</p>
         </div>
         <span class="badge" style="background:${a.color}; color:#fff;">${a.name}</span>
       </div>
@@ -117,6 +132,7 @@ function renderAccounts() {
 }
 
 function renderBudgets() {
+  
   const monthBudgets = budgets.filter(b => b.month === currentMonth);
   if (monthBudgets.length === 0) return;
 
@@ -152,7 +168,7 @@ function renderGoals() {
 
     let progressClass = "warning";
     if (g.saved >= g.target) progressClass = "";
-    else if (new Date(g.date) < today) progressClass = "danger";
+    else if (g.date < todayText) progressClass = "danger";
 
     goalsList.innerHTML += `
       <div class="progress-item">
