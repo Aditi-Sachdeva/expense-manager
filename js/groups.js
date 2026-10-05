@@ -36,12 +36,21 @@ const settleDate = document.getElementById("settleDate");
 const closeSettleModalBtn = document.getElementById("closeSettleModalBtn");
 const cancelSettleBtn = document.getElementById("cancelSettleBtn");
 
-let groups = loadData("groups") || [];
+let groups = loadData("groups");
 let selectedGroupIndex = null;
 let editingExpenseIndex = null;
 
 function saveAll() {
     saveData("groups", groups);
+}
+
+function round2(n) {
+    return Math.round(n * 100) / 100;
+}
+
+function todayStr() {
+    const d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
 }
 
 function openModal(modal) {
@@ -71,6 +80,7 @@ function renderGroupsList() {
     }
 
     groups.forEach((g, i) => {
+
         const div = document.createElement("div");
 
         div.className = "group-item" + (i === selectedGroupIndex ? " active" : "");
@@ -91,6 +101,7 @@ function renderGroupsList() {
 }
 
 function renderGroupDetails() {
+
     if (selectedGroupIndex === null || !groups[selectedGroupIndex]) {
         groupDetails.innerHTML = `
             <div class="empty empty-big">
@@ -137,11 +148,11 @@ function renderGroupDetails() {
             </p>
         `;
     } else {
-        g.members.forEach(m => {
+        g.members.forEach((m, index) => {
             html += `
                 <span class="member-chip">
                     ${m}
-                    <button onclick="removeMember('${m}')">&times;</button>
+                    <button onclick="removeMember(${index})">&times;</button>
                 </span>
             `;
         });
@@ -164,6 +175,7 @@ function renderGroupDetails() {
         html += `<p class="empty-inline">No expenses yet.</p>`;
     } else {
         html += `
+            <div class="table-wrap">
             <table>
                 <thead>
                     <tr>
@@ -183,7 +195,7 @@ function renderGroupDetails() {
                 <tr>
                     <td>${ex.description}</td>
                     <td>${ex.paidBy}</td>
-                    <td>₹${ex.amount.toFixed(2)}</td>
+                    <td>${formatMoney(ex.amount)}</td>
                     <td>${ex.splitType}</td>
                     <td>${ex.date}</td>
                     <td>
@@ -203,6 +215,7 @@ function renderGroupDetails() {
         html += `
                 </tbody>
             </table>
+            </div>
         `;
     }
 
@@ -216,12 +229,21 @@ function renderGroupDetails() {
     `;
 
     balances.forEach(b => {
+        let text = "settled up";
+        let colorClass = "";
+
+        if (b.balance > 0.005) {
+            text = "gets back " + formatMoney(b.balance);
+            colorClass = "green";
+        } else if (b.balance < -0.005) {
+            text = "owes " + formatMoney(-b.balance);
+            colorClass = "red";
+        }
+
         html += `
             <div class="balance-row">
                 <span>${b.member}</span>
-                <span class="balance-amount">
-                    ₹${b.balance.toFixed(2)}
-                </span>
+                <span class="balance-amount ${colorClass}">${text}</span>
             </div>
         `;
     });
@@ -241,7 +263,7 @@ function renderGroupDetails() {
                 <div class="balance-row">
                     <span>${s.from} owes ${s.to}</span>
                     <span class="balance-amount">
-                        ₹${s.amount.toFixed(2)}
+                        ${formatMoney(s.amount)}
                     </span>
                 </div>
             `;
@@ -267,13 +289,14 @@ function renderGroupDetails() {
                 No settlements recorded yet.
             </p>
         `;
-    } else {
+    } 
+    else {
         g.settlements.forEach((s, i) => {
             html += `
                 <div class="balance-row">
                     <span>${s.from} paid ${s.to} on ${s.date}</span>
                     <span class="balance-amount">
-                        ₹${s.amount.toFixed(2)}
+                        ${formatMoney(s.amount)}
                         <button class="btn btn-small btn-danger"
                                 onclick="deleteSettlement(${i})">
                             Delete
@@ -296,10 +319,18 @@ function openGroupModal() {
 }
 
 groupForm.onsubmit = e => {
+    
     e.preventDefault();
 
+    const name = groupNameInput.value.trim();
+
+    if (!name) {
+        alert("Please enter a group name.");
+        return;
+    }
+
     groups.push({
-        name: groupNameInput.value.trim(),
+        name: name,
         members: [],
         expenses: [],
         settlements: []
@@ -348,7 +379,12 @@ memberForm.onsubmit = e => {
     const g = groups[selectedGroupIndex];
     const name = memberNameInput.value.trim();
 
-    if (g.members.includes(name)) {
+    if (!name) {
+        alert("Please enter a member name.");
+        return;
+    }
+
+    if (g.members.some(m => m.toLowerCase() === name.toLowerCase())) {
         alert("This member already exists.");
         return;
     }
@@ -366,8 +402,9 @@ memberForm.onsubmit = e => {
 closeMemberModalBtn.onclick = () => closeModal(memberModal);
 cancelMemberBtn.onclick = () => closeModal(memberModal);
 
-function removeMember(name) {
+function removeMember(index) {
     const g = groups[selectedGroupIndex];
+    const name = g.members[index];
 
     if (g.expenses.length > 0 || g.settlements.length > 0) {
         alert("Cannot remove members once expenses/settlements exist.");
@@ -378,7 +415,7 @@ function removeMember(name) {
         return;
     }
 
-    g.members = g.members.filter(m => m !== name);
+    g.members.splice(index, 1);
 
     saveAll();
 
@@ -402,6 +439,7 @@ function openExpenseModal() {
 
     fillMembersDropdown(expensePaidBy);
 
+    expenseDate.value = todayStr();
     splitType.value = "equal";
 
     updateSplitDetails();
@@ -410,7 +448,12 @@ function openExpenseModal() {
 }
 
 splitType.onchange = updateSplitDetails;
-expenseAmount.oninput = updateSplitDetails;
+
+expenseAmount.oninput = () => {
+    if (splitType.value === "equal") {
+        updateSplitDetails();
+    }
+};
 
 function fillMembersDropdown(select) {
     select.innerHTML = "";
@@ -439,7 +482,7 @@ function updateSplitDetails() {
 
             splitDetails.innerHTML = `
                 <p class="empty-inline">
-                    Each pays ₹${share.toFixed(2)}
+                    Each pays about ${formatMoney(share)}
                 </p>
             `;
         }
@@ -480,20 +523,38 @@ function updateSplitDetails() {
     }
 }
 
+function fixRounding(splits, amt) {
+    const names = Object.keys(splits);
+    const total = names.reduce((sum, m) => sum + splits[m], 0);
+    const diff = round2(amt - total);
+
+    if (names.length > 0 && Math.abs(diff) < 0.02) {
+        const last = names[names.length - 1];
+        splits[last] = round2(splits[last] + diff);
+    }
+}
+
 expenseForm.onsubmit = e => {
     e.preventDefault();
 
     const g = groups[selectedGroupIndex];
-    const amt = parseFloat(expenseAmount.value);
+    const amt = round2(parseFloat(expenseAmount.value));
+
+    if (!(amt > 0)) {
+        alert("Amount must be greater than 0.");
+        return;
+    }
 
     const splits = {};
 
     if (splitType.value === "equal") {
 
-        const share = amt / g.members.length;
+        const paise = Math.round(amt * 100);
+        const base = Math.floor(paise / g.members.length);
+        const extra = paise - base * g.members.length;
 
-        g.members.forEach(m => {
-            splits[m] = share;
+        g.members.forEach((m, i) => {
+            splits[m] = (base + (i < extra ? 1 : 0)) / 100;
         });
 
     } else if (splitType.value === "exact") {
@@ -503,7 +564,7 @@ expenseForm.onsubmit = e => {
         splitDetails.querySelectorAll("input").forEach(inp => {
             const val = parseFloat(inp.value) || 0;
 
-            splits[inp.dataset.member] = val;
+            splits[inp.dataset.member] = round2(val);
             sum += val;
         });
 
@@ -512,6 +573,8 @@ expenseForm.onsubmit = e => {
             return;
         }
 
+        fixRounding(splits, amt);
+
     } else if (splitType.value === "percentage") {
 
         let sum = 0;
@@ -519,7 +582,7 @@ expenseForm.onsubmit = e => {
         splitDetails.querySelectorAll("input").forEach(inp => {
             const val = parseFloat(inp.value) || 0;
 
-            splits[inp.dataset.member] = (val / 100) * amt;
+            splits[inp.dataset.member] = round2((val / 100) * amt);
             sum += val;
         });
 
@@ -527,6 +590,8 @@ expenseForm.onsubmit = e => {
             alert("Percentages must equal 100.");
             return;
         }
+
+        fixRounding(splits, amt);
     }
 
     const newExpense = {
@@ -573,9 +638,11 @@ function editExpense(i) {
 
     if (ex.splitType !== "equal") {
         splitDetails.querySelectorAll("input").forEach(inp => {
+            const share = ex.splits[inp.dataset.member] || 0;
+
             inp.value = ex.splitType === "exact"
-                ? ex.splits[inp.dataset.member]
-                : (ex.splits[inp.dataset.member] / ex.amount * 100);
+                ? share
+                : round2(share / ex.amount * 100);
         });
     }
 
@@ -618,7 +685,7 @@ function calculateBalances(g) {
 
     return g.members.map(m => ({
         member: m,
-        balance: balances[m]
+        balance: round2(balances[m])
     }));
 }
 
@@ -640,7 +707,7 @@ function simplifyDebts(balances) {
         const c = creditors[0];
         const d = debtors[0];
 
-        const amt = Math.min(c.balance, -d.balance);
+        const amt = round2(Math.min(c.balance, -d.balance));
 
         result.push({
             from: d.member,
@@ -648,8 +715,8 @@ function simplifyDebts(balances) {
             amount: amt
         });
 
-        c.balance -= amt;
-        d.balance += amt;
+        c.balance = round2(c.balance - amt);
+        d.balance = round2(d.balance + amt);
 
         if (c.balance < 0.01) {
             creditors.shift();
@@ -676,6 +743,9 @@ function openSettleModal() {
     fillMembersDropdown(settleFrom);
     fillMembersDropdown(settleTo);
 
+    settleTo.selectedIndex = 1;
+    settleDate.value = todayStr();
+
     openModal(settleModal);
 }
 
@@ -683,16 +753,22 @@ settleForm.onsubmit = e => {
     e.preventDefault();
 
     const g = groups[selectedGroupIndex];
+    const amt = round2(parseFloat(settleAmount.value));
 
     if (settleFrom.value === settleTo.value) {
         alert("From and To members must be different.");
         return;
     }
 
+    if (!(amt > 0)) {
+        alert("Amount must be greater than 0.");
+        return;
+    }
+
     g.settlements.push({
         from: settleFrom.value,
         to: settleTo.value,
-        amount: parseFloat(settleAmount.value),
+        amount: amt,
         date: settleDate.value
     });
 
@@ -722,4 +798,3 @@ document.getElementById("newGroupBtn").onclick = () => openGroupModal();
 
 renderGroupsList();
 renderGroupDetails();
-
