@@ -10,3 +10,10 @@ function loadData(key) {
 function deleteData(key) {
   localStorage.removeItem(key);
 }
+
+function formatMoney(amount) {
+  return "₹" + Number(amount).toLocaleString("en-IN", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
